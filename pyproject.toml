@@ -9,7 +9,7 @@ readme = "README.md"
 python = ">=3.8,<3.11"
 dask = {extras = ["complete"], version = "*"}
 dask-jobqueue = "^0.8.1"
-tensorflow = "^2.11.0"
+tensorflow = {version = "^2.11.0", markers = "sys_platform != 'darwin'"}
 protein-bert = "^1.0.1"
 cleo = "^2.0.1"
 
