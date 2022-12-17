@@ -1,7 +1,7 @@
 import os
-import requests
+
 from cleo.commands.command import Command
-from cleo.helpers import argument, option
+from cleo.helpers import option
 
 
 class EmbedCommand(Command):

@@ -26,8 +26,7 @@ client = Client(cluster)
 def inc():
     from tensorflow.python.client import device_lib
     import platform
-    # os.system("module use /opt/insy/modulefiles")
-    # os.system("module load cuda/11.2")
+
     platform = (platform.node())
     return [platform] + (device_lib.list_local_devices())
 
