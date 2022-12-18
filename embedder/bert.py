@@ -1,4 +1,5 @@
 import dataclasses
+from pathlib import Path
 from typing import List
 
 from proteinbert import load_pretrained_model, PretrainingModelGenerator, InputEncoder
@@ -17,6 +18,9 @@ class ProteinBertEmbedder(Embedder):
         (generator, encoder) = load_pretrained_model()
         return cls(generator, encoder)
 
+    def configure(self):
+        pass
+
     def compute_embeddings(self, sequences: List[str]):
         length = max(map(len, sequences)) + 2
         model = self.model_generator.create_model(length)
@@ -24,6 +28,9 @@ class ProteinBertEmbedder(Embedder):
 
         local_representations, _ = model.predict(self.input_encoder.encode_X(sequences, length))
         return local_representations.mean(axis=1)
+
+    def compute_embeddings_from_fasta_file(self, input_file: Path, target_directory: Path):
+        pass
 
     def compute_embedding(self, sequence: str):
         return self.compute_embeddings([sequence])
