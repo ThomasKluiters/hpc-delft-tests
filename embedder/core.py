@@ -14,5 +14,5 @@ class Embedder:
     def compute_embedding(self, sequence: str) -> np.ndarray:
         raise NotImplementedError
 
-    def compute_embeddings_for_file(self, input_file: InputFile) -> InputFile:
+    def compute_embeddings_from_fasta_file(self, input_file: InputFile) -> InputFile:
         pass

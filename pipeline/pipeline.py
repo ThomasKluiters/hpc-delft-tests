@@ -7,6 +7,7 @@ from dask.delayed import Delayed
 
 from annotator.annotator import Annotator
 from common import InputFile
+from data.cache import download_assembly_for_query_as_tasks
 from embedder.core import Embedder
 
 DaskKey = Tuple[str, str]
@@ -40,16 +41,13 @@ class PipelineStep:
 
 @dataclasses.dataclass
 class DownloadStep(PipelineStep):
+    term: str
+
     def prepare(self):
         pass
 
     def build_tasks_for_keys(self, files: List[DaskKey]) -> DaskTasks:
-        return [
-            (("collect", "1"), (lambda: 0, None)),
-            (("sequence", "1"), (lambda x: 0, ("collect", "1"))),
-            (("sequence", "2"), (lambda x: 0, ("collect", "1"))),
-            (("sequence", "3"), (lambda x: 0, ("collect", "1"))),
-        ]
+        return download_assembly_for_query_as_tasks(self.term)
 
 
 @dataclasses.dataclass
@@ -77,12 +75,14 @@ class EmbedderStep(PipelineStep):
         return [self.build_task_for_key(key) for key in keys]
 
     def build_task_for_key(self, key: DaskKey) -> DaskTask:
-        return ("embedding", key[1]), (self.embedder.compute_embeddings_for_file, key)
+        return ("embedding", key[1]), (self.embedder.compute_embeddings_from_fasta_file, key)
 
 
 def convert_key_to_string(key: Optional[Union[DaskKey, Iterable[DaskKey]]]):
     if key is None:
         return None
+    if isinstance(key, list):
+        return key
     if isinstance(key, tuple):
         return "-".join(reversed(key))
     return ["-".join(reversed(k)) for k in key]
@@ -96,13 +96,9 @@ class Pipeline:
         graph = {}
         keys = []
         for step in self.steps:
-            # step.prepare()
+            step.prepare()
             tasks = dict(step.build_tasks_for_keys(keys))
             keys = tasks.keys()
-            graph.update({
-                convert_key_to_string(k): (task, convert_key_to_string(dep))
-                for (k, (task, dep))
-                in tasks.items()
-            })
-        graph['collect'] = (print, list(map(convert_key_to_string, keys)))
+            graph.update(tasks)
+        graph['collect'] = (print, list(keys))
         return graph

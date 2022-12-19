@@ -2,15 +2,19 @@ import dask
 from dask_jobqueue import SLURMCluster
 from distributed import Client
 
+from annotator.prodigal import ProdigalAnnotator
+from embedder.bert import ProteinBertEmbedder
+from pipeline.pipeline import EmbedderStep, AnnotationStep, DownloadStep, Pipeline
+
 quality_of_service = "short"
 partition = "general"
-time = "0:01:00"
+time = "0:10:00"
 
 cluster = SLURMCluster(
-    cores=2,
-    processes=2,
+    cores=1,
+    processes=1,
     queue="tmkluiters",
-    memory="12 GB",
+    memory="32 GB",
     job_extra_directives=[
         f'--qos="{quality_of_service}"',
         f'--partition={partition}',
@@ -18,28 +22,15 @@ cluster = SLURMCluster(
         f'--gres={"gpu:turing:1"}'
     ],
 )
-cluster.scale(2)
+cluster.scale(8)
 client = Client(cluster)
 
 
-@dask.delayed
-def inc():
-    from tensorflow.python.client import device_lib
-    import platform
-
-    platform = (platform.node())
-    return [platform] + (device_lib.list_local_devices())
-
-
-@dask.delayed
-def add(x, y):
-    return x + y
-
-
-a = inc()  # no work has happened yet
-b = inc()  # no work has happened yet
-c = add(a, b)  # no work has happened yet
-
-c = c.compute()  # This triggers all of the above computations
-
-print(c)
+if __name__ == '__main__':
+    pipeline = Pipeline([
+        DownloadStep("PRJNA555636"),
+        AnnotationStep(ProdigalAnnotator()),
+        EmbedderStep(ProteinBertEmbedder.load_model())
+    ])
+    graph = pipeline.build_graph()
+    client.get(graph, ['collect'])

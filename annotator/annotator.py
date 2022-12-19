@@ -18,8 +18,8 @@ class Annotator:
     def configure(self, force: bool = False):
         raise NotImplementedError
 
-    def output_file_for_file(self, file: Path, target_directory: Path) -> InputFile:
-        return InputFile(target_directory, target_directory / Path(f"{self.name()}.{file.name}.proteins"))
+    def output_file_for_file(self, target_directory: Path) -> InputFile:
+        return InputFile(target_directory, target_directory / Path("proteins.fasta"))
 
     def annotate_input_file(self, file: InputFile) -> InputFile:
         return self.annotate_fasta_file(file.file, file.context)

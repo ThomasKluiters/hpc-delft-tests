@@ -64,7 +64,9 @@ class ProdigalAnnotator(Annotator):
                 return None
 
     def annotate_fasta_file(self, input_file: Path, target_directory: Path) -> InputFile:
-        output_file = self.output_file_for_file(input_file, target_directory)
+        output_file = self.output_file_for_file(target_directory)
+        if output_file.file.exists():
+            return output_file
         command = [
             self.find_executable(),
             "-i", input_file,
@@ -76,4 +78,3 @@ class ProdigalAnnotator(Annotator):
         if subprocess.call(command) != 0:
             raise Exception("")
         return output_file
-
