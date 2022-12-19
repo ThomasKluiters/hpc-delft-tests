@@ -35,7 +35,7 @@ if __name__ == '__main__':
     pipeline = Pipeline([
         DownloadStep("PRJNA555636"),
         AnnotationStep(ProdigalAnnotator()),
-        EmbedderStep(ProteinBertEmbedder.load_model())
+        EmbedderStep(ProteinBertEmbedder())
     ])
     graph = pipeline.build_graph()
     print(client.dashboard_link)
