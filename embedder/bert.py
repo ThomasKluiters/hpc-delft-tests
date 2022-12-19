@@ -3,8 +3,11 @@ from typing import List
 import numpy as np
 from Bio import SeqIO
 
+from cluster.slurm import ensure_cuda_modules_loaded
 from common import PG_EMBED_DIR, InputFile
 from embedder.core import Embedder
+
+
 
 
 class ProteinBertEmbedder(Embedder):
@@ -12,6 +15,8 @@ class ProteinBertEmbedder(Embedder):
         pass
 
     def compute_embeddings(self, sequences: List[str]):
+        ensure_cuda_modules_loaded()
+
         from proteinbert.conv_and_global_attention_model import get_model_with_hidden_layers_as_outputs
 
         from proteinbert import load_pretrained_model
