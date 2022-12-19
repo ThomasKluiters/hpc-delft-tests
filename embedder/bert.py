@@ -3,34 +3,28 @@ from pathlib import Path
 from typing import List
 
 from Bio import SeqIO
-from proteinbert import load_pretrained_model, PretrainingModelGenerator, InputEncoder
-from proteinbert.conv_and_global_attention_model import get_model_with_hidden_layers_as_outputs
 
 from common import PG_EMBED_DIR, InputFile
 from embedder.core import Embedder
 
 
-@dataclasses.dataclass
 class ProteinBertEmbedder(Embedder):
-    model_generator: PretrainingModelGenerator
-    input_encoder: InputEncoder
-
-    @classmethod
-    def load_model(cls):
-        model_directory = PG_EMBED_DIR / Path("models") / Path("protein-bert")
-        model_directory.mkdir(parents=True, exist_ok=True)
-        (generator, encoder) = load_pretrained_model(model_directory)
-        return cls(generator, encoder)
-
     def configure(self):
         pass
 
     def compute_embeddings(self, sequences: List[str]):
+        from proteinbert.conv_and_global_attention_model import get_model_with_hidden_layers_as_outputs
+
+        from proteinbert import load_pretrained_model
+        model_directory = PG_EMBED_DIR / Path("models") / Path("protein-bert")
+        model_directory.mkdir(parents=True, exist_ok=True)
+        (generator, encoder) = load_pretrained_model(model_directory)
+
         length = max(map(len, sequences)) + 2
-        model = self.model_generator.create_model(length)
+        model = generator.create_model(length)
         model = get_model_with_hidden_layers_as_outputs(model)
 
-        local_representations, _ = model.predict(self.input_encoder.encode_X(sequences, length))
+        local_representations, _ = model.predict(encoder.encode_X(sequences, length))
         return local_representations.mean(axis=1)
 
     def compute_embeddings_from_fasta_file(self, input_file: InputFile):
