@@ -23,8 +23,13 @@ class ProteinBertEmbedder(Embedder):
         model = generator.create_model(length)
         model = get_model_with_hidden_layers_as_outputs(model)
 
-        local_representations, _ = model.predict(encoder.encode_X(sequences, length))
-        return local_representations.mean(axis=1)
+        tensors = []
+        batch_size = 64
+        for i in range(len(sequences) // batch_size):
+            batch = sequences[i * batch_size:min(len(sequences), (i + 1) * batch_size)]
+            local_representations, _ = model.predict(encoder.encode_X(batch, length))
+            tensors.append(local_representations.mean(axis=1))
+        return np.concatenate(tensors)
 
     def compute_embeddings_from_fasta_file(self, input_file: InputFile):
         output_file = input_file.context / Path("embeddings.data")
