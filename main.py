@@ -23,10 +23,11 @@ cluster = SLURMCluster(
         f'--qos="{quality_of_service}"',
         f'--partition={partition}',
         f'--time={time}',
-        f'--gres={"gpu"}'
+        f'--gres={"gpu:a40"}'
     ],
+    scheduler_options={'dashboard_address':'44444'}
 )
-cluster.scale(64)
+cluster.scale(2)
 client = Client(cluster)
 
 if __name__ == '__main__':
