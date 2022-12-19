@@ -50,6 +50,8 @@ class ProdigalAnnotator(Annotator):
         return None
 
     def version(self):
+        if self.find_executable() is None:
+            return None
         return check_prodigal_version(self.find_executable())
 
     def configure(self, force: bool = False):
