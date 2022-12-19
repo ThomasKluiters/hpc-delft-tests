@@ -28,7 +28,7 @@ class ProteinBertEmbedder(Embedder):
 
             local_representations, _ = model.predict(encoder.encode_X(batch, length))
             tensors.append(local_representations.mean(axis=1))
-        return np.array(tensors)
+        return np.concatenate(tensors)
 
     def compute_embeddings_from_fasta_file(self, input_file: InputFile):
         output_file = input_file.context / Path("embeddings.data")
@@ -42,4 +42,5 @@ class ProteinBertEmbedder(Embedder):
 
     def compute_embedding(self, sequence: str):
         return self.compute_embeddings([sequence])
+
 
