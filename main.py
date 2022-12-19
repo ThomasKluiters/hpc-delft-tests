@@ -27,7 +27,7 @@ cluster = SLURMCluster(
         f'--gres={"gpu"}'
     ],
 )
-cluster.scale(1)
+cluster.scale(4)
 client = Client(cluster)
 
 
