@@ -70,7 +70,6 @@ class EmbedderStep(PipelineStep):
     embedder: Embedder
 
     def prepare(self):
-        ensure_cuda_modules_loaded()
         self.embedder.configure()
 
     def build_tasks_for_keys(self, keys: List[DaskKey]) -> DaskTasks:
