@@ -39,5 +39,5 @@ class ProteinBertEmbedder(Embedder):
 if __name__ == '__main__':
     embedder = ProteinBertEmbedder.load_model()
     sequence = "MDDADPEERNYDNMLKMLSDLNKDLEKLLEEMEKISVQATWMAYDMVVMRTNPTLAESMRRLEDAFVNCKEEMEKNWQELLHETKQRL"
-    embedding = embedder.compute_embeddings([sequence] * 5)
-    print(type(embedding))
+    embedding = embedder.compute_embeddings([sequence] * 512)
+    print(embedding)

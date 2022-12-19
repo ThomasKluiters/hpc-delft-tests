@@ -15,14 +15,14 @@ class Kind(Enum):
     EMBEDDINGS = "EMBEDDING"
 
     def lower(self):
-        return self.value.name.lower()
+        return self.name.lower()
 
 
 class Source(Enum):
     SEQ_IO = "SEQ_IO"
 
     def lower(self):
-        return self.value.name.lower()
+        return self.name.lower()
 
 
 @dataclasses.dataclass
@@ -45,6 +45,6 @@ class BioSeqEntry(Entry):
         with open(path) as handle:
             SeqIO.write(seq, handle, 'fasta')
 
-    def load(self) -> Iterable[SeqIO]:
+    def load(self) -> Iterable[SeqIO.SeqRecord]:
         with open(self.path()) as handle:
             return SeqIO.read(handle, 'fasta')
