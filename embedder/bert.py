@@ -19,13 +19,13 @@ class ProteinBertEmbedder(Embedder):
         model_directory.mkdir(parents=True, exist_ok=True)
         (generator, encoder) = load_pretrained_model(model_directory)
 
+        length = max(map(len, sequences)) + 2
+        model = generator.create_model(length)
+        model = get_model_with_hidden_layers_as_outputs(model)
+
         tensors = []
         for i in range(len(sequences) // 10):
             batch = sequences[i * 10:min(len(sequences), (i + 1) * 10)]
-            length = max(map(len, batch)) + 2
-            model = generator.create_model(length)
-            model = get_model_with_hidden_layers_as_outputs(model)
-
             local_representations, _ = model.predict(encoder.encode_X(batch, length))
             tensors.append(local_representations.mean(axis=1))
         return np.concatenate(tensors)
@@ -42,5 +42,3 @@ class ProteinBertEmbedder(Embedder):
 
     def compute_embedding(self, sequence: str):
         return self.compute_embeddings([sequence])
-
-
