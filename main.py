@@ -10,7 +10,6 @@ from annotator.prodigal import ProdigalAnnotator
 from embedder.bert import ProteinBertEmbedder
 from pipeline.pipeline import EmbedderStep, AnnotationStep, DownloadStep, Pipeline
 
-
 quality_of_service = "short"
 partition = "general"
 time = "0:10:00"
@@ -29,7 +28,6 @@ cluster = SLURMCluster(
 )
 cluster.scale(4)
 client = Client(cluster)
-
 
 if __name__ == '__main__':
     pipeline = Pipeline([

@@ -1,7 +1,6 @@
-import dataclasses
 from pathlib import Path
 from typing import List
-
+import numpy as np
 from Bio import SeqIO
 
 from common import PG_EMBED_DIR, InputFile
@@ -20,12 +19,16 @@ class ProteinBertEmbedder(Embedder):
         model_directory.mkdir(parents=True, exist_ok=True)
         (generator, encoder) = load_pretrained_model(model_directory)
 
-        length = max(map(len, sequences)) + 2
-        model = generator.create_model(length)
-        model = get_model_with_hidden_layers_as_outputs(model)
+        tensors = []
+        for i in range(len(sequences) // 10):
+            batch = sequences[i * 10:min(len(sequences), (i + 1) * 10)]
+            length = max(map(len, batch)) + 2
+            model = generator.create_model(length)
+            model = get_model_with_hidden_layers_as_outputs(model)
 
-        local_representations, _ = model.predict(encoder.encode_X(sequences, length))
-        return local_representations.mean(axis=1)
+            local_representations, _ = model.predict(encoder.encode_X(batch, length))
+            tensors.append(local_representations.mean(axis=1))
+        return np.array(tensors)
 
     def compute_embeddings_from_fasta_file(self, input_file: InputFile):
         output_file = input_file.context / Path("embeddings.data")
@@ -40,9 +43,3 @@ class ProteinBertEmbedder(Embedder):
     def compute_embedding(self, sequence: str):
         return self.compute_embeddings([sequence])
 
-
-if __name__ == '__main__':
-    embedder = ProteinBertEmbedder.load_model()
-    sequence = "MDDADPEERNYDNMLKMLSDLNKDLEKLLEEMEKISVQATWMAYDMVVMRTNPTLAESMRRLEDAFVNCKEEMEKNWQELLHETKQRL"
-    embedding = embedder.compute_embeddings([sequence] * 512)
-    print(embedding)
