@@ -12,13 +12,13 @@ from pipeline.pipeline import EmbedderStep, AnnotationStep, DownloadStep, Pipeli
 
 quality_of_service = "short"
 partition = "general"
-time = "0:10:00"
+time = "4:00:00"
 
 cluster = SLURMCluster(
     cores=1,
     processes=1,
     queue="tmkluiters",
-    memory="8 GB",
+    memory="16 GB",
     job_extra_directives=[
         f'--qos="{quality_of_service}"',
         f'--partition={partition}',
@@ -26,7 +26,7 @@ cluster = SLURMCluster(
         f'--gres={"gpu"}'
     ],
 )
-cluster.scale(4)
+cluster.scale(64)
 client = Client(cluster)
 
 if __name__ == '__main__':
