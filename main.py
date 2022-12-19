@@ -1,8 +1,5 @@
 from cluster.slurm import ensure_cuda_modules_loaded
 
-ensure_cuda_modules_loaded()
-
-import dask
 from dask_jobqueue import SLURMCluster
 from distributed import Client
 

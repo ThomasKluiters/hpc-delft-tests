@@ -6,6 +6,7 @@ import dask
 from dask.delayed import Delayed
 
 from annotator.annotator import Annotator
+from cluster.slurm import ensure_cuda_modules_loaded
 from common import InputFile
 from data.cache import download_assembly_for_query_as_tasks
 from embedder.core import Embedder
@@ -69,6 +70,7 @@ class EmbedderStep(PipelineStep):
     embedder: Embedder
 
     def prepare(self):
+        ensure_cuda_modules_loaded()
         self.embedder.configure()
 
     def build_tasks_for_keys(self, keys: List[DaskKey]) -> DaskTasks:
