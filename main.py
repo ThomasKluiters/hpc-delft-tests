@@ -22,7 +22,7 @@ cluster = SLURMCluster(
     ],
     scheduler_options={'dashboard_address':'44444'}
 )
-cluster.scale(2)
+cluster.scale(16)
 client = Client(cluster)
 
 if __name__ == '__main__':
