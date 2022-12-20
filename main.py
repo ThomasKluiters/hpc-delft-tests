@@ -1,5 +1,3 @@
-from cluster.slurm import ensure_cuda_modules_loaded
-
 from dask_jobqueue import SLURMCluster
 from distributed import Client
 
@@ -20,7 +18,7 @@ cluster = SLURMCluster(
         f'--qos="{quality_of_service}"',
         f'--partition={partition}',
         f'--time={time}',
-        f'--gres={"gpu:a40"}'
+        f'--gres={"gpu"}',
     ],
     scheduler_options={'dashboard_address':'44444'}
 )
